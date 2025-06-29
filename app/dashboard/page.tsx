@@ -1,12 +1,26 @@
 "use client";
 
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PencilLine } from "lucide-react";
+import { motion, useAnimationControls } from "framer-motion";
 
 export default function Dashboard() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
+  const controls = useAnimationControls();
+
+  useEffect(() => {
+    controls.start({
+      scale: [1, 1.015, 1],
+      transition: { duration: 0.3, ease: "easeInOut" },
+    });
+  }, [title, content]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,61 +49,62 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-10">
+    <div className="max-w-3xl mx-auto py-10 px-4">
       <SignedIn>
-        <h1 className="text-3xl font-bold mb-6 text-center">Write a New Article</h1>
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-xl shadow-md space-y-5"
-        >
-          <div>
-            <label className="block mb-1 font-medium text-gray-700" htmlFor="title">
-              Title
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-          </div>
+        <motion.div animate={controls}>
+          <Card className="bg-black border border-white/10 text-white shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl flex items-center gap-2 text-red-500">
+                <PencilLine className="w-6 h-6" /> Write a New Article
+              </CardTitle>
+            </CardHeader>
 
-          <div>
-            <label className="block mb-1 font-medium text-gray-700" htmlFor="content">
-              Content
-            </label>
-            <textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg min-h-[200px] focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-          </div>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="title" className="block text-sm font-semibold mb-1">
+                    📝 Title
+                  </label>
+                  <Input
+                    id="title"
+                    placeholder="e.g., Scaling React Apps"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="bg-zinc-900 text-white placeholder-gray-500 border-white/10"
+                  />
+                </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 rounded-lg text-white font-medium transition ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700"
-            }`}
-          >
-            {loading ? "Publishing..." : "🚀 Publish Article"}
-          </button>
-        </form>
+                <div>
+                  <label htmlFor="content" className="block text-sm font-semibold mb-1">
+                    🧠 Content
+                  </label>
+                  <Textarea
+                    id="content"
+                    placeholder="Write something amazing..."
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    className="bg-zinc-900 text-white placeholder-gray-500 border-white/10 min-h-[200px]"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {loading ? "Publishing..." : "🚀 Publish Article"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </motion.div>
       </SignedIn>
 
       <SignedOut>
-        <div className="text-center mt-20">
-          <h2 className="text-2xl font-semibold mb-4">
-            Please sign in to write articles
-          </h2>
+        <div className="text-center mt-20 text-white">
+          <h2 className="text-2xl font-semibold mb-4">Please sign in to write articles</h2>
           <SignInButton>
-            <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700">
+            <button className="bg-red-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-red-700">
               Sign In
             </button>
           </SignInButton>
